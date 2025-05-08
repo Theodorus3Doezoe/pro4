@@ -1,0 +1,15 @@
+.header_container {
+    height: 12vh;
+    background-color: #854679;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+}
+
+.header_img {
+    height: 100%;
+    /* width: 100%; */
+    padding: 1vh;
+}
+

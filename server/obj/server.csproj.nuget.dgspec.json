@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Sven\\pro4\\server\\server.csproj": {}
+    "C:\\Users\\alexa\\pro4\\server\\server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Sven\\pro4\\server\\server.csproj": {
+    "C:\\Users\\alexa\\pro4\\server\\server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Sven\\pro4\\server\\server.csproj",
+        "projectUniqueName": "C:\\Users\\alexa\\pro4\\server\\server.csproj",
         "projectName": "server",
-        "projectPath": "C:\\Users\\Sven\\pro4\\server\\server.csproj",
-        "packagesPath": "C:\\Users\\Sven\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Sven\\pro4\\server\\obj\\",
+        "projectPath": "C:\\Users\\alexa\\pro4\\server\\server.csproj",
+        "packagesPath": "C:\\Users\\alexa\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\alexa\\pro4\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Sven\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\alexa\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -84,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
