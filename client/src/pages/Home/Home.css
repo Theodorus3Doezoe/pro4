@@ -1,0 +1,17 @@
+.video_container {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 3vh 0;
+}
+
+.video_container img {
+    height: 25vh;
+    border-radius: 10px;
+}
+
+.video_container img:hover {
+    height: 30vh;
+    border-radius: 10px;
+}
