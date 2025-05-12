@@ -11,6 +11,7 @@ import Home from './pages/Home/Home';
 import Play from './pages/Play/Play';
 import Profile from './pages/Profile/Profile';
 
+
 // Package voor kortere http requests
 axios.defaults.baseURL = 'http://localhost:8000'
 axios.defaults.withCredentials = true
