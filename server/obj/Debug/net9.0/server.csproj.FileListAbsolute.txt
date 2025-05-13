@@ -27,3 +27,6 @@ C:\Users\Sven\pro4\server\obj\Debug\net9.0\refint\server.dll
 C:\Users\Sven\pro4\server\obj\Debug\net9.0\server.pdb
 C:\Users\Sven\pro4\server\obj\Debug\net9.0\server.genruntimeconfig.cache
 C:\Users\Sven\pro4\server\obj\Debug\net9.0\ref\server.dll
+C:\Users\Sven\pro4\server\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Users\Sven\pro4\server\obj\Debug\net9.0\server.csproj.AssemblyReference.cache
+C:\Users\Sven\pro4\server\obj\Debug\net9.0\server.csproj.Up2Date
