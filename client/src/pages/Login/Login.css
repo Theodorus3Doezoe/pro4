@@ -34,6 +34,7 @@
     font-size: 30px;
     font-weight: 500;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .login-container-input {
@@ -72,8 +73,9 @@
     background: none;
     border: none;
     color: grey;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .lost-password-text:hover {
