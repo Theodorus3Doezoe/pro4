@@ -20,11 +20,11 @@
 
 .video-container {
   flex: 2;
-  border-radius: 8px;
-  height: auto;
+  border-radius: 10px;
+  height: 500px;
   overflow: hidden;
   position: relative;
-  padding-bottom: 56.25%;
+
 }
 
 .video-container iframe {
@@ -44,20 +44,22 @@
 
 .webcam-container {
   background-color: black;
-  height: 200px;
-  border-radius: 8px;
+  height: 250px;
+  border-radius: 10px;
 }
 
 .heartrate-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  margin-top: 20px;
+  font-size: 4rem;
+  margin-top: 70px;
+  color: #854679;
+  font-weight: 700;
 }
 
 .heart-icon {
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   margin-right: 10px;
 }

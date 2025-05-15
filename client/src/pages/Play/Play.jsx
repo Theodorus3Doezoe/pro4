@@ -3,6 +3,7 @@ import './Play.css'
 import Youtube from 'react-youtube'
 import Header from '../../components/Header/Header'
 import heartIcon from '../../assets/heart-rate.png'
+import { FaUser } from "react-icons/fa";
 
 export default function Play() {
   const options = {
