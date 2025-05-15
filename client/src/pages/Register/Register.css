@@ -1,0 +1,150 @@
+.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #854679;
+    min-height: 100vh;
+}
+
+.register-container {
+    background-color: white;
+    width: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgb(0, 0, 0.2);
+}
+
+.register-container-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #854679;
+}
+
+.register-container-top-text {
+    color: white;
+}
+
+.exit-register-container {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 30px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.register-container-input {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+}
+
+.register-container-input input {
+    padding: 10px;
+    padding-left: 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid grey;
+}
+
+.register-container-bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 20px;
+    align-items: center;
+}
+
+/* register button */
+.register-button {
+    background-color: #854679;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-weight: bold;
+}
+
+/* 'Already have an account' */
+.login-text {
+    background: none;
+    border: none;
+    color: grey;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.login-text:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+/* icons */
+.eye-icon {
+    cursor: pointer;
+    color: grey;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.user-icon {
+    color: grey;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.mail-icon {
+    color: grey;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+/* validation messages*/
+.valid-email {
+    display: block;
+    color: red;
+    text-align: center;
+    font-size: 14px;
+}
+
+.valid-password {
+    display: block;
+    color: red;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* input boxes */
+.username-input {
+    position: relative;
+}
+
+.username-input input {
+    width: 100%;
+    padding: 10px;
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    width: 100%;
+    padding: 10px;
+}
+
+.email-input {
+    position: relative;
+}
+
+.email-input input {
+    width: 100%;
+    padding: 10px;
+}
