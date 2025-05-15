@@ -1,0 +1,134 @@
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #854679;
+    min-height: 100vh;
+}
+
+.login-container {
+    background-color: white;
+    width: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgb(0, 0, 0.2);
+}
+
+.login-container-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #854679;
+}
+
+.login-container-top-text {
+    color: white;
+}
+
+.exit-login-container {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 30px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.login-container-input {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+}
+
+.login-container-input input {
+    padding: 10px;
+    padding-left: 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid grey;
+}
+
+.login-container-bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 20px;
+    align-items: center;
+}
+
+.sign-in-button {
+    background-color: #854679;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-weight: bold;
+}
+
+.lost-password-text {
+    background: none;
+    border: none;
+    color: grey;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.lost-password-text:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+.register-text {
+    background: none;
+    border: none;
+    color: grey;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.register-text:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+.eye-icon {
+    cursor: pointer;
+    color: grey;
+}
+
+.user-icon {
+    color: grey;
+}
+
+.username-input {
+    position: relative;
+}
+
+.username-input input {
+    width: 100%;
+    padding: 10px;
+}
+
+.user-icon {
+    position: absolute;
+    right: 10px;
+    top: 28%;
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    width: 100%;
+    padding: 10px;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 28%;
+}
