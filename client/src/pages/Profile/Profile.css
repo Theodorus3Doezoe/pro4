@@ -1,9 +1,23 @@
-.profile_picture {
-    width: 150px;
-    height: 150px;
+.profile_container {
+    width: 30vw;
+    border: solid 2px green;
+    margin-top: 15vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+#profile_image {
+    border: solid purple 3px;
+    width: 35%;
     border-radius: 50%;
-    border: 3px solid purple;
-    right: -40px;
-    bottom: -25px;
-    position: relative;
+    object-fit: contain;
+    /* margin-left: 5vw; */
+    
+    /* margin-bottom: -30vh; */
+}
+
+.profile_text {
+    /* text-align: center; */
 }
