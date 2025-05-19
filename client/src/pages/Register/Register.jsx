@@ -4,7 +4,7 @@ import { FaUser, FaEyeSlash, FaEye } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { useState } from 'react';
 import validator from 'validator';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -59,24 +59,13 @@ export default function Register() {
       setPasswordError('')
     }
   }
-
-  //navigation
-  const navigate = useNavigate();
-
-  const GoToLogin = () => {
-    navigate('/login')
-  }
-
-  const GoToHome = () => {
-    navigate('/')
-  }
     
   return (
     <div className='register-page'>
       <div className="register-container">
         <div className="register-container-top">
           <h1 className='register-container-top-text'>Register</h1>
-          <button className='exit-register-container' onClick={GoToHome}>X</button>
+          <Link className='exit-register-container' to={'/'}>X</Link>
         </div>
         <div className="register-container-input">
           <div className="email-input">
@@ -116,7 +105,7 @@ export default function Register() {
         </div>
         <div className="register-container-bottom">
           <button className='register-button'>Register</button>
-          <button className='login-text' onClick={GoToLogin}> Already have an account? </button>
+          <Link className='login-text' to={'/login'}> Already have an account? </Link>
         </div>
       </div>
     </div>

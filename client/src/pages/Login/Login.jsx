@@ -2,7 +2,7 @@ import React from 'react'
 import './Login.css'
 import { FaUser, FaEyeSlash, FaEye } from "react-icons/fa";
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,23 +10,13 @@ export default function Login() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   }
-
-  const navigate = useNavigate();
-
-  const handleGoToRegister = () => {
-    navigate('/register')
-  }
-
-  const handleGoToHome = () => {
-    navigate('/')
-  }
   
   return (
     <div className='login-page'>
       <div className="login-container">
         <div className="login-container-top">
           <h1 className='login-container-top-text'>Login</h1>
-          <button className='exit-login-container' onClick={handleGoToHome}>X</button>
+          <Link className='exit-login-container' to={'/'}>X</Link>
         </div>
         <div className="login-container-input">
           <div className="username-input">
@@ -45,7 +35,7 @@ export default function Login() {
         <div className="login-container-bottom">
           <button className='sign-in-button'>Sign In</button>
           <button className='lost-password-text'>Lost your password?</button>
-          <button className='register-text' onClick={handleGoToRegister}>register for an account</button>
+          <Link className='register-text' to={'/register'}>register for an account</Link>
         </div>
       </div>
     </div>
