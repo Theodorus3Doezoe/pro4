@@ -1,0 +1,9 @@
+.profile_picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid purple;
+    right: -40px;
+    bottom: -25px;
+    position: relative;
+}
