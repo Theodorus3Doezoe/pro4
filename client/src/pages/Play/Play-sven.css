@@ -1,0 +1,74 @@
+.play-body {
+    height: 100vh;
+    width: 100%;
+}
+
+.play-page {
+    height: 100%;
+    display: grid;
+    align-items: center;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 65vh;
+    margin: auto 0;
+}
+
+.video-container, .webcam-container{
+    position: relative;
+    height: 65vh;
+    border-radius: 10px;
+}
+
+.video-player, .video-canvas{
+    height: 100%;
+    border-radius: 10px;    
+}
+
+.stat-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.score-container, .heartrate-container {
+    display: flex;
+    align-items: center;
+    width: min-content;
+    font-size: 5vh;
+    height: 5vh;
+    margin: 1vh 0;
+}
+
+.heart-icon, .score-icon{
+    height: 100%;
+    margin-right: .2vw;
+    color: #854679;
+}
+
+.video-canvas, .webcam-canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    /* display: none; */
+}
+
+.side-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.webcam-container {
+    height: min-content;
+    transform: scale(-1, 1);
+}
+
+.webcam {
+    border-radius: 10px;
+}

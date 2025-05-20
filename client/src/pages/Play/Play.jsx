@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import './Play.css';
+import './Play-sven.css';
 import Header from '../../components/Header/Header';
 import heartIcon from '../../assets/heart-rate.png';
 import { FaStar } from 'react-icons/fa';
@@ -198,13 +198,15 @@ export default function Play() {
             <canvas ref={videoCanvasRef} className='video-canvas' />
           </div>
           <div className='side-container'>
-            <div className="score-container">
-              <FaStar className='score-icon' />
-              <h1 className='score-number'>999</h1>
-            </div>
-            <div className='heartrate-container'>
-              <img className='heart-icon' src={heartIcon} alt='Heart Icon' />
-              <span className='heartrate-number'>999</span>
+            <div className="stat-container">
+              <div className="score-container">
+                <FaStar className='score-icon' />
+                <span className='score-number'>999</span>
+              </div>
+              <div className='heartrate-container'>
+                <img className='heart-icon' src={heartIcon} alt='Heart Icon' />
+                <span className='heartrate-number'>999</span>
+              </div>
             </div>
             <div className='webcam-container'>
               <Webcam
