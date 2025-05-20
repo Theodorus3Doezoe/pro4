@@ -29,17 +29,6 @@ export default function Home() {
             <FaPlay className='play_icon'/>
           </Link>
         </div>
-        <div className="image_container">
-          <Link to={'/play'}>
-            <img src="https://i.ytimg.com/vi/oNRf5JJzltI/hqdefault.jpg?sqp=-oaymwEnCPYBEIoBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBpcAiWcfiHWyboS9uXwnyePFbowQ" alt="" />
-            <FaPlay className='play_icon'/>
-          </Link>
-        </div>
-
-
-
-
-
       </div> 
       <div className="leaderbord_container">
         <div className="leaderbord_name">

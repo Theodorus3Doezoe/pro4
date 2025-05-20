@@ -11,12 +11,12 @@ import Login from './pages/Login/Login';
 import Home from './pages/Home/Home';
 import Play from './pages/Play/Play';
 import Profile from './pages/Profile/Profile';
-
-
+ 
+ 
 // Package voor kortere http requests
 axios.defaults.baseURL = 'http://localhost:8000'
 axios.defaults.withCredentials = true
-
+ 
 const router = createBrowserRouter([
   //Register pagina
   {
@@ -44,8 +44,8 @@ const router = createBrowserRouter([
     element: <Profile/>,
   },
 ])
-
-
+ 
+ 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* Package voor meldingen */}
@@ -53,3 +53,5 @@ createRoot(document.getElementById('root')).render(
     <RouterProvider router={router}/>
   </StrictMode>,
 )
+ 
+ 
