@@ -1,10 +1,8 @@
 .header_container {
     height: 6vh;
     background-color: #854679;
-    width: 100%;
     display: flex;
     justify-content: space-between;
-    /* align-items: center; */
 }
 
 .header_img {
@@ -13,3 +11,6 @@
     padding: 1vh;
 }
 
+a {
+    width: 5vh;
+}
