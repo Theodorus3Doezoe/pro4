@@ -5,7 +5,7 @@ import axios from 'axios'
 import {Toaster} from 'react-hot-toast'
 import './main.css'
 import { Link } from 'react-router';
- 
+
 import Register from './pages/Register/Register';
 import Login from './pages/Login/Login';
 import Home from './pages/Home/Home';
