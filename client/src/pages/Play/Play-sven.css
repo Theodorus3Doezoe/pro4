@@ -1,6 +1,6 @@
 .play-body {
-    height: 100vh;
-    width: 100%;
+    height: 92vh;
+    width: 100vw;
 }
 
 .play-page {
@@ -9,6 +9,9 @@
     flex-direction: column;
     /* align-items: center; */
     justify-content: center;
+    /* border: red 5px solid; */
+
+    /* border: solid brown 5px; */
     /* align-items: center; */
     /* justify-content: center; */
 }
@@ -19,7 +22,7 @@
     flex-direction: row;
     justify-content: space-evenly;
     height: 65vh;
-    margin: 2vh 0;
+    /* margin: 2vh 0; */
     /* margin: 0 0; */
 }
 
@@ -65,25 +68,58 @@
 .side-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
+    /* border: #854679 5px solid; */
 }
 
 .webcam-container {
     height: min-content;
-    transform: scale(-1, 1);
+    transform: scaleX(-1);
+
 }
 
 .webcam {
     border-radius: 10px;
 }
 
-.connect-hr-container {
+/* .connect-hr-container , .extra-video-container{
     display: flex;
     justify-content: center;
+    flex-grow: 2;
+} */
+
+.connect-device-btn, .end-workout-btn {
+    padding: 2vh;
+    background-color: #854679;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    width: max-content;
 }
 
-.connect-hr-button {
-    margin: 0;
-    background-color: #85467;
-    padding: 1vh;
+.connect-device-btn:hover, .end-workout-btn:hover {
+    cursor: pointer;
+    background-color: #854679;
+    opacity: 80%;
+}
+
+.video-column {
+    display: flex;
+        /* border: solid green 5px; */
+    height: max-content;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
+    position: relative;
+}
+
+.btn-container {
+    width: 100%;
+    /* border: solid green 5px; */
+    display: flex;
+    justify-content: space-evenly;
+    /* position: absolute; */
+    z-index: 11;
+    /* top: -8vh; */
 }

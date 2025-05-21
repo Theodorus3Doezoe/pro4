@@ -22,7 +22,7 @@ export default function Profile() {
         <hr />
         <h4 id="Naam">Lid sinds</h4>
         <h4 id="text">1 Januari, 2025</h4>
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={handleLogout} className='logout-button'>Logout</button>
       </div>
       <div className='workout_container'>
         <h1 className="text_kop" id="text_kop">

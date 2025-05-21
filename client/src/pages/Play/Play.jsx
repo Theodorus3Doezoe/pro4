@@ -40,9 +40,11 @@ const normalizeKeypoints = (pose, videoWidth, videoHeight) => {
   const hipMidPointX = (leftHip.x + rightHip.x) / 2;
   const hipMidPointY = (leftHip.y + rightHip.y) / 2;
   let referenceDistance = euclideanDistance(leftShoulder, rightShoulder);
-  if (referenceDistance < 1e-3) {
-    referenceDistance = videoWidth / 4;
+
+  if (referenceDistance < 1e-3) { 
+    referenceDistance = Math.max(videoWidth, videoHeight) / 4; 
   }
+
   return pose.keypoints.map(kp => {
     if (kp.score > 0.3) {
       return {
@@ -65,12 +67,15 @@ export default function Play() {
 
   const [webcamPose, setWebcamPose] = useState(null);
   const [videoPose, setVideoPose] = useState(null);
-  const [cumulativeScore, setCumulativeScore] = useState(0);
+  
+  const [displayedScore, setDisplayedScore] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const [heartRate, setHeartRate] = useState(null);
   const [isHrConnected, setIsHrConnected] = useState(false);
-  const [hrDevice, setHrDevice] = useState(null); // Sla het Bluetooth-apparaat op
-  const [hrCharacteristic, setHrCharacteristic] = useState(null); // Sla de characteristic op
+  const [hrDevice, setHrDevice] = useState(null);
+  const [hrCharacteristic, setHrCharacteristic] = useState(null);
+  // const [bluetoothError, setBluetoothError] = useState(null); 
 
   const videoConstraints = {
     width: 640,
@@ -78,29 +83,26 @@ export default function Play() {
     facingMode: 'user',
   };
 
-  // Functie om hartslagdata te parsen
   const parseHeartRate = (value) => {
-    // value is een DataView object
     const flags = value.getUint8(0);
-    const rate16Bits = (flags & 0x1); // Check of hartslag 8 of 16 bits is
+    const rate16Bits = (flags & 0x1);
     let hrValue;
     if (rate16Bits) {
-      hrValue = value.getUint16(1, true); // true voor little-endian
+      hrValue = value.getUint16(1, true);
     } else {
       hrValue = value.getUint8(1);
     }
     return hrValue;
   };
 
-  // Event handler voor hartslag updates
   const handleHeartRateChanged = useCallback((event) => {
     const value = event.target.value;
     const newHeartRate = parseHeartRate(value);
     console.log('New Heart Rate:', newHeartRate);
     setHeartRate(newHeartRate);
-  }, []);
+  }, []); 
 
-
+  // Effect 1: Model laden (draait één keer bij mount)
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -109,32 +111,100 @@ export default function Play() {
         const detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING };
         const moveNet = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
         setDetector(moveNet);
-        setIsDetecting(true);
+        setIsDetecting(true); 
+        console.log("MoveNet model loaded (dedicated effect).");
       } catch (error) {
         console.error("Error loading MoveNet model:", error);
       }
     };
     loadModel();
+  }, []); // Lege dependency array
 
-    // Cleanup bij unmount
+  // Effect 2: Video speelstatus bijhouden
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    const handlePlay = () => setIsVideoPlaying(true);
+    const handlePause = () => setIsVideoPlaying(false);
+    const handleEnded = () => setIsVideoPlaying(false);
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('pause', handlePause);
+    videoElement.addEventListener('ended', handleEnded);
+    const initialCheckTimeout = setTimeout(() => {
+        if (!videoElement.paused && !videoElement.ended && videoElement.readyState >= 3) {
+            setIsVideoPlaying(true);
+        } else {
+            setIsVideoPlaying(false);
+        }
+    }, 200);
     return () => {
-      if (hrDevice && hrDevice.gatt.connected) {
-        console.log('Disconnecting from HR device on component unmount...');
-        hrDevice.gatt.disconnect();
-      }
-      if (hrCharacteristic) {
-         // Verwijder event listener als de characteristic nog bestaat
-        hrCharacteristic.removeEventListener('characteristicvaluechanged', handleHeartRateChanged);
+        clearTimeout(initialCheckTimeout);
+        videoElement.removeEventListener('play', handlePlay);
+        videoElement.removeEventListener('pause', handlePause);
+        videoElement.removeEventListener('ended', handleEnded);
+    };
+  }, []); 
+
+  // Effect 3: Bluetooth Apparaat (hrDevice) cleanup
+  useEffect(() => {
+    const currentDevice = hrDevice; // Leg huidige device vast voor cleanup closure
+    console.log('hrDevice effect: currentDevice is', currentDevice?.id);
+
+    return () => {
+      console.log('Cleanup for hrDevice effect. Device in closure:', currentDevice?.id);
+      if (currentDevice && currentDevice.gatt && currentDevice.gatt.connected) {
+        console.log(`Cleaning up device ${currentDevice.id} (disconnecting).`);
+        // Als dit device wordt opgeruimd, moeten ook zijn characteristic en listener worden opgeruimd.
+        if (hrCharacteristic && hrCharacteristic.service.device.id === currentDevice.id) {
+          console.log(`   Also cleaning up characteristic ${hrCharacteristic.uuid} for device ${currentDevice.id}`);
+          try {
+            if (hrCharacteristic.stopNotifications) {
+              hrCharacteristic.stopNotifications().catch(e => console.warn("Cleanup (hrDevice): Error stopping notifications:", e));
+            }
+            hrCharacteristic.removeEventListener('characteristicvaluechanged', handleHeartRateChanged);
+          } catch (e) {
+            console.warn("Cleanup (hrDevice): Error with characteristic cleanup:", e);
+          }
+          // Overweeg setHrCharacteristic(null) hier als de characteristic specifiek bij dit device hoort
+          // en niet al door een andere flow wordt gereset.
+        }
+        currentDevice.gatt.disconnect();
+      } else if (currentDevice) {
+        console.log(`Cleanup for hrDevice effect: Device ${currentDevice.id} was present but not connected.`);
       }
     };
-  }, [hrDevice, hrCharacteristic, handleHeartRateChanged]); // hrCharacteristic en handleHeartRateChanged toegevoegd
+  }, [hrDevice]); // Draait alleen als hrDevice referentie verandert (of bij unmount)
+
+  // Effect 4: Bluetooth Characteristic (hrCharacteristic) listener management
+  useEffect(() => {
+    const currentCharacteristic = hrCharacteristic; // Leg huidige characteristic vast
+    console.log('hrCharacteristic effect: currentCharacteristic is', currentCharacteristic?.uuid);
+
+    if (currentCharacteristic && currentCharacteristic.service.device.gatt && currentCharacteristic.service.device.gatt.connected) { // Alleen listener toevoegen als device verbonden is
+      console.log(`Adding listener to characteristic ${currentCharacteristic.uuid}`);
+      currentCharacteristic.addEventListener('characteristicvaluechanged', handleHeartRateChanged);
+    }
+    return () => {
+      if (currentCharacteristic) {
+        console.log(`Removing listener from characteristic ${currentCharacteristic.uuid}`);
+        try {
+          currentCharacteristic.removeEventListener('characteristicvaluechanged', handleHeartRateChanged);
+          // Stop notifications hier alleen als de characteristic zelf wordt verwijderd,
+          // niet per se als alleen de listener wordt verwijderd.
+          // De hrDevice cleanup zou stopNotifications moeten afhandelen.
+        } catch (e) {
+          console.warn("Cleanup (hrCharacteristic): Error removing listener:", e);
+        }
+      }
+    };
+  }, [hrCharacteristic, handleHeartRateChanged]); // handleHeartRateChanged is stabiel
 
   const drawKeypoints = useCallback((pose, ctx, isMirrored = false, canvasWidth = 0) => {
     if (!pose || !pose.keypoints) return;
     for (const keypoint of pose.keypoints) {
       let { name, x, y, score } = keypoint;
-      const skip = ['left_eye', 'right_eye', 'left_ear', 'right_ear'];
-      if (score > 0.3 && (!skip.includes(name) || name === 'nose')) {
+      const skip = ['left_eye', 'right_eye', 'left_ear', 'right_ear']; 
+      if (score > 0.3 && (!skip.includes(name) || name === 'nose')) { 
         if (isMirrored) x = canvasWidth - x;
         ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fillStyle = 'red'; ctx.fill();
       }
@@ -164,65 +234,68 @@ export default function Play() {
   }, []);
 
   useEffect(() => {
-    if (!isDetecting || !detector) return;
+    if (!isDetecting || !detector) return; 
     let rafId;
     const detectWebcamPose = async () => {
-      if (webCamRef.current?.video?.readyState === 4) {
-        const video = webCamRef.current.video; const canvas = canvasRef.current;
+      if (webCamRef.current?.video?.readyState === 4) { 
+        const video = webCamRef.current.video; 
+        const canvas = canvasRef.current;
         if (!canvas) { rafId = requestAnimationFrame(detectWebcamPose); return; }
-        const ctx = canvas.getContext('2d'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d'); 
+        canvas.width = video.videoWidth; 
+        canvas.height = video.videoHeight;
         try {
           const poses = await detector.estimatePoses(video, { flipHorizontal: false });
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           if (poses?.length > 0) {
             setWebcamPose(poses[0]);
-            drawKeypoints(poses[0], ctx, true, canvas.width); drawSkeleton(poses[0], ctx, true, canvas.width);
+            drawKeypoints(poses[0], ctx, false, canvas.width); 
+            drawSkeleton(poses[0], ctx, false, canvas.width);
           } else { setWebcamPose(null); }
         } catch (error) { console.error('Pose estimation error (webcam):', error); setWebcamPose(null); }
       }
       rafId = requestAnimationFrame(detectWebcamPose);
     };
-    detectWebcamPose(); return () => cancelAnimationFrame(rafId);
+    detectWebcamPose(); 
+    return () => cancelAnimationFrame(rafId);
   }, [detector, isDetecting, drawKeypoints, drawSkeleton]);
 
   useEffect(() => {
-    if (!isDetecting || !detector) return;
+    if (!isDetecting || !detector) return; 
     let rafId;
+    const videoElement = videoRef.current;
     const detectVideoElementPose = async () => {
-      if (videoRef.current?.readyState >= 3) {
-        const video = videoRef.current; const canvas = videoCanvasRef.current;
+      if (videoElement?.readyState >= 3) { 
+        const canvas = videoCanvasRef.current;
         if (!canvas) { rafId = requestAnimationFrame(detectVideoElementPose); return; }
-        const ctx = canvas.getContext('2d'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d'); 
+        canvas.width = videoElement.videoWidth; 
+        canvas.height = videoElement.videoHeight;
         try {
-          const poses = await detector.estimatePoses(video, { flipHorizontal: false });
+          const poses = await detector.estimatePoses(videoElement, { flipHorizontal: false });
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           if (poses?.length > 0) {
             setVideoPose(poses[0]);
-            drawKeypoints(poses[0], ctx, false); drawSkeleton(poses[0], ctx, false);
+            drawKeypoints(poses[0], ctx, false); 
+            drawSkeleton(poses[0], ctx, false);
           } else { setVideoPose(null); }
         } catch (error) { console.error('Pose estimation error (video element):', error); setVideoPose(null); }
       }
       rafId = requestAnimationFrame(detectVideoElementPose);
     };
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      const playPromise = videoElement.play();
-      if (playPromise !== undefined) {
-        playPromise.then(detectVideoElementPose).catch(error => {
-          console.warn("Video play was prevented:", error); detectVideoElementPose();
-        });
-      } else { detectVideoElementPose(); }
-    }
+    if (videoElement) { detectVideoElementPose(); }
     return () => cancelAnimationFrame(rafId);
-  }, [detector, isDetecting, drawKeypoints, drawSkeleton]);
+  }, [detector, isDetecting, drawKeypoints, drawSkeleton]); 
 
   const calculateInstantSimilarity = useCallback((userP, refP) => {
     if (!userP || !refP || !webCamRef.current?.video || !videoRef.current) return 0;
-    const webcamVideoEl = webCamRef.current.video; const refVideoEl = videoRef.current;
+    const webcamVideoEl = webCamRef.current.video; 
+    const refVideoEl = videoRef.current;
     const normalizedUserKP = normalizeKeypoints(userP, webcamVideoEl.videoWidth, webcamVideoEl.videoHeight);
     const normalizedRefKP = normalizeKeypoints(refP, refVideoEl.videoWidth, refVideoEl.videoHeight);
     if (!normalizedUserKP || !normalizedRefKP) return 0;
-    let totalDistance = 0; let comparableKeypointsCount = 0;
+    let totalDistance = 0; 
+    let comparableKeypointsCount = 0;
     const userKpMap = new Map(normalizedUserKP.filter(kp => kp.x_norm !== null && kp.y_norm !== null).map(kp => [kp.name, kp]));
     const keypointsToCompare = [
         'nose', 'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist',
@@ -238,100 +311,116 @@ export default function Play() {
     }
     if (comparableKeypointsCount === 0) return 0;
     const averageDistance = totalDistance / comparableKeypointsCount;
-    return Math.round(Math.max(0, 100 * Math.exp(-averageDistance * 3)));
+    return Math.round(Math.max(0, 100 * Math.exp(-averageDistance * 2.5))); 
   }, []);
 
-  useEffect(() => {
-    if (webcamPose && videoPose) {
+useEffect(() => {
+    if (isVideoPlaying && webcamPose && videoPose) { 
       const instantaneousSimilarity = calculateInstantSimilarity(webcamPose, videoPose);
       let pointsEarned = 0;
-      if (instantaneousSimilarity > 60) pointsEarned = 10;
-      else if (instantaneousSimilarity > 50) pointsEarned = 8;
-      else if (instantaneousSimilarity > 40) pointsEarned = 6;
-      else if (instantaneousSimilarity > 30) pointsEarned = 4;
-      else if (instantaneousSimilarity > 20) pointsEarned = 2;
+      if (instantaneousSimilarity > 30) pointsEarned = 0; 
       else if (instantaneousSimilarity > 10) pointsEarned = 1;
-      if (pointsEarned > 0) setCumulativeScore(prevScore => prevScore + pointsEarned);
+
+      if (pointsEarned > 0) {
+        // Update displayedScore direct
+        setDisplayedScore(prevScore => prevScore + pointsEarned);
+      }
     }
-  }, [webcamPose, videoPose, calculateInstantSimilarity]);
+    // Als video niet speelt, wordt er geen score berekend of toegevoegd.
+    // Als je de score wilt resetten wanneer de video stopt, kan dat in de handleEnded functie.
+  }, [webcamPose, videoPose, calculateInstantSimilarity, isVideoPlaying])
 
   const handleConnectHeartRate = async () => {
+    // setBluetoothError(null);
     if (!navigator.bluetooth) {
-      alert('Web Bluetooth API is niet beschikbaar in deze browser.');
+      console.warn('Web Bluetooth API is niet beschikbaar in deze browser.');
+      // setBluetoothError('Web Bluetooth API is niet beschikbaar in deze browser.');
       return;
     }
 
-    if (hrDevice && hrDevice.gatt.connected) {
-      console.log('Verbinding met hartslagmeter verbreken...');
+    // Disconnect logic if already connected
+    if (hrDevice && hrDevice.gatt && hrDevice.gatt.connected) {
+      console.log('Handmatig loskoppelen gestart voor device:', hrDevice.id);
+      // De useEffect voor hrDevice (die afhangt van [hrDevice]) zal de daadwerkelijke
+      // loskoppeling en opruiming van characteristic afhandelen wanneer setHrDevice(null) wordt aangeroepen.
+      // Hier resetten we de states, wat de cleanup effecten zal triggeren.
       try {
-        if (hrCharacteristic) {
-          await hrCharacteristic.stopNotifications();
-          hrCharacteristic.removeEventListener('characteristicvaluechanged', handleHeartRateChanged);
-          console.log('Notificaties gestopt en listener verwijderd.');
-          setHrCharacteristic(null);
+        // Stop notificaties direct als characteristic nog bestaat
+        if (hrCharacteristic && hrCharacteristic.stopNotifications) {
+            await hrCharacteristic.stopNotifications();
+            console.log('Notificaties gestopt (handmatige disconnect).');
+            // Listener wordt verwijderd door de hrCharacteristic useEffect cleanup
         }
-        hrDevice.gatt.disconnect();
-        console.log('Apparaat losgekoppeld.');
-        setIsHrConnected(false);
-        setHeartRate(null);
-        setHrDevice(null);
-      } catch (error) {
-        console.error('Fout bij loskoppelen:', error);
-        // Reset states ook bij fout
-        setIsHrConnected(false);
-        setHeartRate(null);
-        setHrDevice(null);
-        setHrCharacteristic(null);
+      } catch (e) {
+        console.warn('Fout bij stoppen notificaties tijdens handmatige disconnect:', e);
       }
+      // Trigger de cleanup effecten door states te nullen
+      setHrCharacteristic(null); // Eerst char, dan device
+      setHrDevice(null); 
+      setIsHrConnected(false);
+      setHeartRate(null);
       return;
     }
 
+    let localDevice; 
     try {
       console.log('Bluetooth-apparaat aanvragen...');
-      const device = await navigator.bluetooth.requestDevice({
+      localDevice = await navigator.bluetooth.requestDevice({
         filters: [{ services: ['heart_rate'] }],
-        // optionalServices: [...] // indien nodig voor andere data
       });
-      console.log('Apparaat geselecteerd:', device.name || device.id);
-      setHrDevice(device);
+      console.log('Apparaat geselecteerd:', localDevice.name || localDevice.id);
+      // setHrDevice(localDevice); // Wordt later gezet na succesvolle verbinding
 
-      device.addEventListener('gattserverdisconnected', () => {
-        console.log('Hartslagmeter onverwacht losgekoppeld.');
+      localDevice.addEventListener('gattserverdisconnected', () => {
+        console.log(`Hartslagmeter ${localDevice?.name || localDevice?.id} onverwacht losgekoppeld.`);
+        // setBluetoothError(`Apparaat ${localDevice?.name || localDevice?.id} losgekoppeld.`);
         setIsHrConnected(false);
         setHeartRate(null);
-        setHrDevice(null);
-        if (hrCharacteristic) {
-            hrCharacteristic.removeEventListener('characteristicvaluechanged', handleHeartRateChanged);
-            setHrCharacteristic(null);
-        }
+        setHrDevice(prevDevice => (prevDevice && prevDevice.id === localDevice?.id ? null : prevDevice));
+        setHrCharacteristic(prevChar => (prevChar && prevChar.service.device.id === localDevice?.id ? null : prevChar));
       });
 
       console.log('Verbinding maken met GATT Server...');
-      const server = await device.gatt.connect();
+      const server = await localDevice.gatt.connect();
       console.log('Verbonden met GATT Server.');
+      if (!server.connected) throw new Error("GATT Server niet verbonden na connect().");
+      
+      setHrDevice(localDevice); // Nu pas hrDevice state zetten
 
       console.log('Heart Rate Service opvragen...');
       const service = await server.getPrimaryService('heart_rate');
       console.log('Heart Rate Service verkregen.');
+      if (!server.connected) throw new Error("GATT Server verbinding verbroken voor service.");
 
       console.log('Heart Rate Measurement Characteristic opvragen...');
       const characteristic = await service.getCharacteristic('heart_rate_measurement');
       console.log('Heart Rate Measurement Characteristic verkregen.');
-      setHrCharacteristic(characteristic); // Sla characteristic op
+      if (!server.connected) throw new Error("GATT Server verbinding verbroken voor characteristic.");
+      
+      setHrCharacteristic(characteristic); // Nu pas hrCharacteristic state zetten
 
       console.log('Notificaties starten...');
       await characteristic.startNotifications();
-      characteristic.addEventListener('characteristicvaluechanged', handleHeartRateChanged);
-      console.log('Notificaties gestart. Wachten op hartslagdata...');
+      console.log('Notificaties gestart.');
+      // Listener wordt toegevoegd door de useEffect die afhangt van hrCharacteristic
+      
       setIsHrConnected(true);
+      // setBluetoothError(null); 
 
     } catch (error) {
       console.error('Fout bij verbinden met hartslagmeter:', error);
-      alert(`Kon niet verbinden met hartslagmeter: ${error.message}`);
+      console.warn(`Kon niet verbinden met hartslagmeter: ${error.message}`);
+      // setBluetoothError(`Fout: ${error.message}`);
+      
+      if (localDevice && localDevice.gatt && localDevice.gatt.connected) {
+        try { localDevice.gatt.disconnect(); } 
+        catch (e) { console.error("Fout bij poging tot disconnect na error:", e); }
+      }
+      // Reset states om cleanup effects te triggeren indien nodig
+      setHrCharacteristic(null);
+      setHrDevice(null); 
       setIsHrConnected(false);
       setHeartRate(null);
-      setHrDevice(null);
-      setHrCharacteristic(null);
     }
   };
 
@@ -339,33 +428,45 @@ export default function Play() {
     <div className='play-body'>
       <Header />
       <div className='play-page'>
-        <div className="connect-hr-container">
-          <button onClick={handleConnectHeartRate} className="connect-hr-button">
-            <FaHeartbeat style={{ marginRight: '8px' }} />
-            {isHrConnected ? `Verbonden: ${hrDevice?.name || 'Apparaat'}` : "Verbind Hartslagmeter"}
-          </button>
-        </div>
         <div className='main-content'>
-          <div className='video-container'>
-            <video ref={videoRef} className='video-player' controls autoPlay muted loop playsInline src={video1} />
-            <canvas ref={videoCanvasRef} className='video-canvas' />
+
+          {/* Linkerkolom: Knop "Beëindig workout" en Videospeler */}
+          <div className="video-column">
+            <div className="btn-container">
+              <button className='end-workout-btn'>Beëindig workout</button>
+              <button onClick={handleConnectHeartRate} className="connect-device-btn">
+                <FaHeartbeat style={{ marginRight: '8px' }} />
+                {isHrConnected ? `Verbonden met: ${hrDevice?.name || 'Onbekend apparaat'}` : "Verbind apparaat"}
+              </button>
+            </div>
+            <div className='video-container'>
+              <video ref={videoRef} className='video-player' controls autoPlay muted loop playsInline src={video1} />
+              <canvas ref={videoCanvasRef} className='video-canvas' />
+            </div>
           </div>
+
+          {/* Rechterkolom: Stats, "Verbind apparaat" knop, en Webcam */}
           <div className='side-container'>
-            <div className="stat-container">
-              <div className="score-container">
-                <FaStar className='score-icon' />
-                <span className='score-number'>{cumulativeScore}</span>
-              </div>
-              <div className='heartrate-container'>
-                <img className='heart-icon' src={heartIcon} alt='Heart Icon' />
-                <span className='heartrate-number'>{heartRate !== null ? heartRate : "N/A"}</span>
+            <div className="side-container-top-content">
+   
+              <div className="stat-container">
+                <div className="score-container">
+                  <FaStar className='score-icon' />
+                  <span className='score-number'>{displayedScore}</span>
+                </div>
+                <div className='heartrate-container'>
+                  <img className='heart-icon' src={heartIcon} alt='Heart Icon' />
+                  <span className='heartrate-number'>{heartRate !== null ? heartRate : "N/A"}</span>
+                </div>
               </div>
             </div>
+
             <div className='webcam-container'>
               <Webcam ref={webCamRef} className='webcam' audio={false} videoConstraints={videoConstraints} mirrored={false} playsInline />
               <canvas ref={canvasRef} className='webcam-canvas' />
             </div>
           </div>
+
         </div>
       </div>
     </div>

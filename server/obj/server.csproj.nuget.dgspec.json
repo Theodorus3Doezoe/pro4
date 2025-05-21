@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/sven/pro4/server/server.csproj": {}
+    "C:\\Users\\svend\\school\\pro4\\server\\server.csproj": {}
   },
   "projects": {
-    "/home/sven/pro4/server/server.csproj": {
+    "C:\\Users\\svend\\school\\pro4\\server\\server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/sven/pro4/server/server.csproj",
+        "projectUniqueName": "C:\\Users\\svend\\school\\pro4\\server\\server.csproj",
         "projectName": "server",
-        "projectPath": "/home/sven/pro4/server/server.csproj",
-        "packagesPath": "/home/sven/.nuget/packages/",
-        "outputPath": "/home/sven/pro4/server/obj/",
+        "projectPath": "C:\\Users\\svend\\school\\pro4\\server\\server.csproj",
+        "packagesPath": "C:\\Users\\svend\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\svend\\school\\pro4\\server\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/sven/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\svend\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net9.0": {
@@ -82,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/sven/.dotnet/sdk/9.0.105/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
