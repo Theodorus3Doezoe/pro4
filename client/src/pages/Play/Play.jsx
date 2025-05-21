@@ -8,6 +8,8 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import video1 from '../../assets/video1.mp4'; // Zorg dat dit pad klopt
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 // HULPFUNCTIES (buiten de component)
 const euclideanDistance = (kp1, kp2) => {
@@ -77,6 +79,11 @@ export default function Play() {
   const [hrCharacteristic, setHrCharacteristic] = useState(null);
   // const [bluetoothError, setBluetoothError] = useState(null); 
 
+  //api
+  const [accumulatedPlayedSeconds, setAccumulatedPlayedSeconds] = useState(0);
+  const lastPlayTimestampRef = useRef(0); // Voor nauwkeurige tijdmeting
+  const animationFrameRef = useRef(null); // Voor requestAnimationFrame
+
   const videoConstraints = {
     width: 640,
     height: 480,
@@ -144,6 +151,32 @@ export default function Play() {
         videoElement.removeEventListener('ended', handleEnded);
     };
   }, []); 
+
+   // --- NIEUW EFFECT: ACCUMULEREN VAN AFGESPEELDE TIJD ---
+  useEffect(() => {
+    const tick = () => {
+      if (isVideoPlaying) {
+        const now = performance.now();
+        if (lastPlayTimestampRef.current > 0) { // Zorgt ervoor dat het correct start na een pauze
+          const deltaSeconds = (now - lastPlayTimestampRef.current) / 1000;
+          setAccumulatedPlayedSeconds(prevSeconds => prevSeconds + deltaSeconds);
+        }
+        lastPlayTimestampRef.current = now; // Update voor de volgende frame
+      }
+      animationFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    if (isVideoPlaying) {
+      lastPlayTimestampRef.current = performance.now(); // Start/reset de timestamp als het spelen begint/hervat
+      animationFrameRef.current = requestAnimationFrame(tick);
+    } else {
+      lastPlayTimestampRef.current = 0; // Reset als de video niet speelt
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+
+    return () => cancelAnimationFrame(animationFrameRef.current);
+  }, [isVideoPlaying]); // Draait opnieuw als isVideoPlaying verandert
+
 
   // Effect 3: Bluetooth Apparaat (hrDevice) cleanup
   useEffect(() => {
@@ -318,7 +351,7 @@ useEffect(() => {
     if (isVideoPlaying && webcamPose && videoPose) { 
       const instantaneousSimilarity = calculateInstantSimilarity(webcamPose, videoPose);
       let pointsEarned = 0;
-      if (instantaneousSimilarity > 30) pointsEarned = 0; 
+      if (instantaneousSimilarity > 80 ) pointsEarned = 0; 
       else if (instantaneousSimilarity > 10) pointsEarned = 1;
 
       if (pointsEarned > 0) {
@@ -329,6 +362,50 @@ useEffect(() => {
     // Als video niet speelt, wordt er geen score berekend of toegevoegd.
     // Als je de score wilt resetten wanneer de video stopt, kan dat in de handleEnded functie.
   }, [webcamPose, videoPose, calculateInstantSimilarity, isVideoPlaying])
+
+    // --- NIEUWE FUNCTIE OM WORKOUT TE BEËINDIGEN EN OPGESLAGEN ---
+  const handleFinishWorkout = async () => {
+    // Stop de video en tijdregistratie
+    if(videoRef.current) {
+        videoRef.current.pause(); // Dit triggert de useEffect voor isVideoPlaying en stopt de accumulator
+    }
+    // Wacht even tot de state updates (isVideoPlaying, accumulatedPlayedSeconds) zijn verwerkt
+    // Dit is een kleine workaround; idealiter zou je de state directer managen of de actuele waarde gebruiken.
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+
+    if (accumulatedPlayedSeconds < 1) { // Check de geaccumuleerde tijd
+        toast.error("Workout is te kort om op te slaan.");
+        if(videoRef.current && videoRef.current.paused) { // Als video niet meer speelt, geef optie om te hervatten
+            // videoRef.current.play(); // of toon een "hervat workout" knop
+        }
+        return;
+    }
+
+    const workoutData = {
+        score: displayedScore,
+        durationInSeconds: Math.round(accumulatedPlayedSeconds), // Gebruik geaccumuleerde tijd
+        workoutDate: new Date().toISOString(), // Huidige datum/tijd in UTC
+    };
+
+    try {
+        // Zorg ervoor dat je axios (of fetch) correct is geconfigureerd voor authenticatie (bijv. withCredentials: true)
+        const response = await axios.post('/api/workouts', workoutData, { withCredentials: true });
+        toast.success(response.data.message || "Workout succesvol opgeslagen!");
+        
+        // Reset states voor een eventuele nieuwe workout
+        setDisplayedScore(0);
+        setAccumulatedPlayedSeconds(0);
+        navigate('/'); // Als je wilt navigeren
+    } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+            toast.error(error.response.data.message);
+        } else {
+            toast.error('Fout bij het opslaan van de workout. Probeer opnieuw.');
+        }
+        console.error("Fout bij opslaan workout:", error);
+    }
+  };
 
   const handleConnectHeartRate = async () => {
     // setBluetoothError(null);
@@ -433,7 +510,7 @@ useEffect(() => {
           {/* Linkerkolom: Knop "Beëindig workout" en Videospeler */}
           <div className="video-column">
             <div className="btn-container">
-              <button className='end-workout-btn'>Beëindig workout</button>
+              <button onClick={handleFinishWorkout} className='end-workout-btn'>Beëindig workout</button>
               <button onClick={handleConnectHeartRate} className="connect-device-btn">
                 <FaHeartbeat style={{ marginRight: '8px' }} />
                 {isHrConnected ? `Verbonden met: ${hrDevice?.name || 'Onbekend apparaat'}` : "Verbind apparaat"}

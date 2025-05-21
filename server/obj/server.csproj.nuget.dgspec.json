@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\svend\\school\\pro4\\server\\server.csproj": {}
+    "/home/sven/pro4/server/server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\svend\\school\\pro4\\server\\server.csproj": {
+    "/home/sven/pro4/server/server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\svend\\school\\pro4\\server\\server.csproj",
+        "projectUniqueName": "/home/sven/pro4/server/server.csproj",
         "projectName": "server",
-        "projectPath": "C:\\Users\\svend\\school\\pro4\\server\\server.csproj",
-        "packagesPath": "C:\\Users\\svend\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\svend\\school\\pro4\\server\\obj\\",
+        "projectPath": "/home/sven/pro4/server/server.csproj",
+        "packagesPath": "/home/sven/.nuget/packages/",
+        "outputPath": "/home/sven/pro4/server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\svend\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/sven/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -47,6 +47,10 @@
             "BCrypt.Net-Next": {
               "target": "Package",
               "version": "[4.0.3, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -61,6 +65,10 @@
             "MySql.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.3, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.10.0, )"
             }
           },
           "imports": [
@@ -82,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/sven/.dotnet/sdk/9.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,13 +1,13 @@
-import React from 'react'
-import './Login.css'
+import React, { useState } from 'react';
+import './Login.css'; // Zorg dat dit pad klopt
 import { FaUser, FaEyeSlash, FaEye } from "react-icons/fa";
-import { useState } from 'react';
-import { Link } from 'react-router';
-import axios from 'axios'
-import toast from 'react-hot-toast'
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate voor redirect
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); // Hook voor navigatie
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -16,91 +16,74 @@ export default function Login() {
   const [data, setData] = useState({
     username: '',
     password: '',
-  })
+  });
 
-const loginUser = async (e) => {
-  e.preventDefault();
-  const { username, password } = data; // 'data' is hier je component state voor username/password
+  const loginUser = async (e) => {
+    e.preventDefault();
+    const { username, password } = data;
 
-  try {
-    // De 'response' variabele bevat het volledige antwoord van Axios
-    // De daadwerkelijke data van de server zit in 'response.data'
-    const response = await axios.post('/login', { // Zorg dat '/login' correct is voor je setup
-      username,
-      password,
-    });
+    try {
+      // Belangrijk: als je backend op een andere poort/domein draait dan je frontend
+      // (bijv. backend op localhost:5001 en frontend op localhost:3000),
+      // dan moet je `withCredentials: true` meegeven zodat cookies worden meegestuurd.
+      // Je backend CORS policy moet ook `AllowCredentials()` toestaan.
+      const response = await axios.post('/login', {
+        username,
+        password,
+      }, { withCredentials: true }); // Voeg withCredentials toe
 
-    // Als de request succesvol is (status code 2xx), komt de code hier.
-    // Axios plaatst de JSON response van de server in response.data
-    // Je C# backend stuurt { message: "Login successful" } bij succes.
-    // Eventueel stuur je ook een token mee: { message: "...", token: "..." }
+      if (response.data && response.data.message) {
+        toast.success(response.data.message);
+      } else {
+        toast.success('Login Succesvol!');
+      }
 
-    if (response.data && response.data.message) {
-      toast.success(response.data.message); // Gebruik het bericht van de backend!
-    } else {
-      toast.success('Login Successful!'); // Fallback als er geen bericht is
+      setData({ username: '', password: '' });
+
+      // Optioneel: update een globale state (Context API, Redux) om aan te geven dat gebruiker is ingelogd
+      // Voorbeeld: setIsLoggedIn(true);
+
+      // Stuur gebruiker door naar bijvoorbeeld een dashboard
+      navigate('/'); // Pas de route aan naar wens
+
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else if (error.request) {
+        toast.error('Geen antwoord van de server. Probeer het later opnieuw.');
+        console.error('Login error - no response:', error.request);
+      } else {
+        toast.error('Er is een fout opgetreden. Probeer het opnieuw.');
+        console.error('Login error - setup:', error.message);
+      }
     }
-
-    setData({ username: '', password: '' }); // Reset formulier
-
-    // Als je backend ook een token stuurt bij succesvolle login:
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      // Hier kun je de gebruiker doorsturen, bijv.
-      // window.location.href = '/dashboard';
-    }
-
-  } catch (error) {
-    // Als de server een error status code stuurt (4xx of 5xx), komt de code hier.
-    // Axios plaatst de error details in het 'error' object.
-    // De response van de server zit dan vaak in 'error.response.data'.
-    // Je C# backend stuurt bijv. { message: "Invalid password" }
-
-    if (error.response && error.response.data && error.response.data.message) {
-      // Als de server een JSON response met een 'message' property stuurt
-      toast.error(error.response.data.message);
-    } else if (error.request) {
-      // Als het request is gemaakt maar er geen response is ontvangen
-      // (bijv. server is down, netwerkprobleem)
-      toast.error('No response from server. Please try again later.');
-      console.error('Login error - no response:', error.request);
-    } else {
-      // Iets anders ging mis bij het opzetten van het request
-      toast.error('An error occurred. Please try again.');
-      console.error('Login error - setup:', error.message);
-    }
-  }
-};
+  };
 
   return (
     <div className='login-page'>
       <div className="login-container">
-        <div className="login-container-top">
-          <h1 className='login-container-top-text'>Login</h1>
-          <Link className='exit-login-container' to={'/'}>X</Link>
-        </div>
-        <div className="login-container-input">
-          <form onSubmit={loginUser}>
-            <div className="username-input">
-              <input type='text' placeholder='Username' value={data.username} onChange={(e) => setData({...data, username: e.target.value})} />
-              <FaUser className='user-icon'/>
-            </div>
-            <div className="password-input">
-              <input type={showPassword ? 'text' : 'password'} placeholder='Password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})} />
-              {showPassword ? (
-                <FaEye className='eye-icon' onClick={togglePasswordVisibility} />
-              ) : (
-                <FaEyeSlash className='eye-icon' onClick={togglePasswordVisibility} />
-              )}
-            </div>
-            <div className="login-container-bottom">
-              <button type='submit' className='sign-in-button'>Sign In</button>
-              <button className='lost-password-text'>Lost your password?</button>
-              <Link className='register-text' to={'/register'}>register for an account</Link>
-            </div>
-            </form>
-        </div>
+        {/* ... je bestaande JSX ... */}
+        <form onSubmit={loginUser}>
+          {/* ... je input velden ... */}
+          <div className="username-input">
+            <input type='text' placeholder='Username' value={data.username} onChange={(e) => setData({...data, username: e.target.value})} required />
+            <FaUser className='user-icon'/>
+          </div>
+          <div className="password-input">
+            <input type={showPassword ? 'text' : 'password'} placeholder='Password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})} required />
+            {showPassword ? (
+              <FaEye className='eye-icon' onClick={togglePasswordVisibility} />
+            ) : (
+              <FaEyeSlash className='eye-icon' onClick={togglePasswordVisibility} />
+            )}
+          </div>
+          <div className="login-container-bottom">
+            <button type='submit' className='sign-in-button'>Sign In</button>
+            <button type='button' className='lost-password-text'>Lost your password?</button> {/* type='button' als het geen submit is */}
+            <Link className='register-text' to={'/register'}>register for an account</Link>
+          </div>
+        </form>
       </div>
     </div>
-  )
+  );
 }

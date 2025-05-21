@@ -1,0 +1,19 @@
+.workout-row-text-container{
+    display: grid;
+    grid-template-columns: 1fr, 1fr, 1fr;
+    grid-template-rows: 1fr;
+    text-align: center;
+    /* justify-content: center; */
+}
+
+.score {
+    grid-column: 1;
+}
+
+.tijd {
+    grid-column: 2;
+}
+
+.datum {
+    grid-column: 3;
+}
