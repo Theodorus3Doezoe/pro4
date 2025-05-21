@@ -14,7 +14,7 @@ import Profile from './pages/Profile/Profile';
  
  
 // Package voor kortere http requests
-axios.defaults.baseURL = 'http://localhost:8000'
+axios.defaults.baseURL = 'http://localhost:5122'
 axios.defaults.withCredentials = true
  
 const router = createBrowserRouter([

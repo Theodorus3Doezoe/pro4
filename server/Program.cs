@@ -6,7 +6,27 @@ using MySql.EntityFrameworkCore.Extensions;
 using System.Linq;
 using BCrypt.Net;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins(
+                                  "http://localhost:5173" // VERVANG DIT met de exacte URL van je React app
+                                  // Je kunt meerdere origins toevoegen als dat nodig is:
+                                  // "http://localhost:5173", // Bijvoorbeeld als je Vite gebruikt
+                                  // "https://jouw-productie-frontend.com"
+                                )
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials(); // << BELANGRIJK: Deze regel toevoegen!
+                      });
+});
 
 // Voeg de DbContext toe voor MySQL
 var connectionString = builder.Configuration.GetConnectionString("MySQLConnection");
@@ -21,8 +41,7 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 
 var app = builder.Build();
 
-// In-memory store
-var users = new List<User>();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapGet("/users", async (MyDbContext dbContext) =>
 {
@@ -87,13 +106,13 @@ app.MapPost("/login", async (MyDbContext dbContext, HttpContext http) =>
     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Name == creds.Username);
 
     if (user == null)
-        return Results.BadRequest(new { message = "User does not exist" });
+        return Results.BadRequest(new { message = "Ongeldige gebuikersnaam of wachtwoord" });
 
     bool isPasswordValid = BCrypt.Net.BCrypt.Verify(creds.Password, user.Password);
 
     if (!isPasswordValid)
     {
-        return Results.BadRequest(new { message = "Invalid password" }); // Using a generic message for security
+        return Results.BadRequest(new { message = "Ongeldige gebuikersnaam of wachtwoord" }); // Using a generic message for security
     }
 
     return Results.Ok(new { message = "Login successful" });

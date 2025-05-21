@@ -4171,11 +4171,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/sven/fontys/pro4/server/server.csproj",
+      "projectUniqueName": "/home/sven/pro4/server/server.csproj",
       "projectName": "server",
-      "projectPath": "/home/sven/fontys/pro4/server/server.csproj",
+      "projectPath": "/home/sven/pro4/server/server.csproj",
       "packagesPath": "/home/sven/.nuget/packages/",
-      "outputPath": "/home/sven/fontys/pro4/server/obj/",
+      "outputPath": "/home/sven/pro4/server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/sven/.nuget/NuGet/NuGet.Config"

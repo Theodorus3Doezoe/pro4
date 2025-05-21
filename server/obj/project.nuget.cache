@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XNB/cb01CFc=",
+  "dgSpecHash": "DDZ5r0aw1wI=",
   "success": true,
-  "projectFilePath": "/home/sven/fontys/pro4/server/server.csproj",
+  "projectFilePath": "/home/sven/pro4/server/server.csproj",
   "expectedPackageFiles": [
     "/home/sven/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/home/sven/.nuget/packages/bouncycastle.cryptography/2.5.1/bouncycastle.cryptography.2.5.1.nupkg.sha512",
