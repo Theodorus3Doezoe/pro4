@@ -10,6 +10,7 @@ import * as poseDetection from '@tensorflow-models/pose-detection';
 import video1 from '../../assets/video1.mp4'; // Zorg dat dit pad klopt
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import {useNavigate} from 'react-router-dom'
 
 // HULPFUNCTIES (buiten de component)
 const euclideanDistance = (kp1, kp2) => {
@@ -60,6 +61,7 @@ const normalizeKeypoints = (pose, videoWidth, videoHeight) => {
 };
 
 export default function Play() {
+  const navigate = useNavigate(); // Hook voor navigatie
   const webCamRef = useRef(null);
   const canvasRef = useRef(null);
   const [detector, setDetector] = useState(null);

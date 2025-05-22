@@ -62,27 +62,31 @@ export default function Login() {
   return (
     <div className='login-page'>
       <div className="login-container">
-        {/* ... je bestaande JSX ... */}
-        <form onSubmit={loginUser}>
-          {/* ... je input velden ... */}
-          <div className="username-input">
-            <input type='text' placeholder='Username' value={data.username} onChange={(e) => setData({...data, username: e.target.value})} required />
-            <FaUser className='user-icon'/>
-          </div>
-          <div className="password-input">
-            <input type={showPassword ? 'text' : 'password'} placeholder='Password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})} required />
-            {showPassword ? (
-              <FaEye className='eye-icon' onClick={togglePasswordVisibility} />
-            ) : (
-              <FaEyeSlash className='eye-icon' onClick={togglePasswordVisibility} />
-            )}
-          </div>
-          <div className="login-container-bottom">
-            <button type='submit' className='sign-in-button'>Sign In</button>
-            <button type='button' className='lost-password-text'>Lost your password?</button> {/* type='button' als het geen submit is */}
-            <Link className='register-text' to={'/register'}>register for an account</Link>
-          </div>
-        </form>
+        <img src="./src/assets/logo_trans.png" alt="logo" id="logo1" />
+              <form form onSubmit={loginUser} className='auth-form'>
+                <div className="input-fields">
+                  <div className="username-input">
+                    <input type='text' placeholder='Gebruikersnaam' value={data.username} onChange={(e) => setData({...data, username: e.target.value})} required />
+                    <FaUser className='auth-icons'/>
+                  </div>
+                  <div className="password-input">
+                    <input type={showPassword ? 'text' : 'password'} placeholder='Wachtwoord' value={data.password} onChange={(e) => setData({...data, password: e.target.value})} required />
+                    {showPassword ? (
+                      <FaEye className='auth-icons' onClick={togglePasswordVisibility} />
+                    ) : (
+                      <FaEyeSlash className='auth-icons' onClick={togglePasswordVisibility} />
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <button className="auth-btn" type='submit'>Login</button>
+                </div>
+              </form>
+
+        <div className="login-container-bottom">
+          <Link className='bottom-link' to={'/'}>Wachtwoord vergeten?</Link>
+          <Link className='bottom-link' to={'/register'}>Account aanmaken</Link>
+        </div>
       </div>
     </div>
   );

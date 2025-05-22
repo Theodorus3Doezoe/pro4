@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import Workout from '../../components/Workout/Workout';
 
 const formatDuration = (totalSeconds) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -22,6 +21,22 @@ const formatDate = (dateString) => {
     }
 };
 
+const formatDateYM = (dateString) => {
+    // Verwijder 'hour' en 'minute' uit de opties
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    try {
+        // new Date(dateString).toLocaleDateString(locale, options) geeft de datum
+        // new Date(dateString).toLocaleTimeString(locale, options) geeft de tijd
+        // new Date(dateString).toLocaleString(locale, options) geeft datum en tijd
+
+        // We gebruiken toLocaleDateString omdat we alleen de datum willen
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    } catch (e) {
+        // Het is ook goed om een error te loggen voor debugging
+        console.error("Fout bij het formatteren van de datum:", e);
+        return "Ongeldige datum";
+    }
+};
 
 export default function Profile() {
  const [userData, setUserData] = useState(null);
@@ -103,6 +118,9 @@ export default function Profile() {
   return (
     <>
       <Header/>
+      <div className="profile-page-container">
+
+
       <div className="profile_container">
         <h1 className="profile_text" id="name">Account Details</h1>
         <h2 className="profile_text1">Beheer uw account informatie</h2>
@@ -112,12 +130,15 @@ export default function Profile() {
         <h4 id="text">{userData.email}</h4>
         <hr />
         <h4 id="Naam">Lid sinds</h4>
-        <h4 id="text">{userData.dateJoined}</h4>
+        <h4 id="text">{formatDateYM(userData.dateJoined)}</h4>
         <button onClick={handleLogout} className='logout-button'>Logout</button>
       </div>
       <div className='workout_container'>
         <div className="workout-history-container">
-            <h2>Mijn Recente Workouts</h2>
+          <div className="top-table-text">
+            <h2>Mijn Recente Workouts </h2>
+            <h2>Highscore: ...</h2>
+          </div>
             {workouts.length === 0 ? (
                 <p>Je hebt nog geen workouts voltooid om weer te geven.</p>
             ) : (
@@ -142,6 +163,7 @@ export default function Profile() {
                 </table>
             )}
         </div>
+      </div>
       </div>
     </>
   )

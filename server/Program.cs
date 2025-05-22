@@ -123,7 +123,7 @@ app.MapDelete("/users/{id}", async (int id, MyDbContext dbContext) =>
 app.MapPost("/register", async (MyDbContext dbContext, HttpContext http) =>
 {
     var creds = await http.Request.ReadFromJsonAsync<RegisterDto>();
-    if (creds == null || string.IsNullOrWhiteSpace(creds.Username) || string.IsNullOrWhiteSpace(creds.Password))
+    if (creds == null || string.IsNullOrWhiteSpace(creds.Username) || string.IsNullOrWhiteSpace(creds.Email) || string.IsNullOrWhiteSpace(creds.Password) || string.IsNullOrWhiteSpace(creds.ConfirmPassword))
         return Results.BadRequest(new { message = "Invalid payload" }); //versturen als object vanwege toast
 
     if (await dbContext.Users.AnyAsync(u => u.Name == creds.Username))

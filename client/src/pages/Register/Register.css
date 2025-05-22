@@ -85,26 +85,15 @@
 }
 
 /* icons */
-.eye-icon {
+.auth-icons {
+    color: darkgray;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.password-input .auth-icons {
     cursor: pointer;
-    color: grey;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
-
-.user-icon {
-    color: grey;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
-
-.mail-icon {
-    color: grey;
-    position: absolute;
-    right: 10px;
-    top: 10px;
 }
 
 /* validation messages*/
@@ -149,3 +138,4 @@
     width: 100%;
     padding: 10px;
 }
+
