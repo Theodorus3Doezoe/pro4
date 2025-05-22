@@ -42,35 +42,32 @@
 }
 
 
-.leaderbord_container {
-    height: 45vh;
+.leaderbord_container,  .workout-history-container{
     width: 35vw;
     margin:auto;
-    position: relative;
+    /* position: relative; */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    /* justify-content: center; */
+    border: solid #854679 3px;
+    border-radius: 15px;
+}
+
+.leaderbord_container {
+    max-height: 60vh;
+    overflow: scroll;
 }
 
 .leaderbord_name {
-    background-color: purple;
-    color: white;
+    color: #854679;
     text-align: center;
-    width: 50%;
-    margin: 0 auto;
     border-radius: 10px;
-    position: absolute;
-    top: -5%;
-    z-index: 1;
     font-size: 1vw;
+    padding: 1vh;
 }
 
-.leaderbord_border {
-    border-radius: 10px;
-    height: 100%;
-    width: 100%;
-    border: 4px solid purple;
-    border-radius: 10px;
-    margin:auto;
-    position: relative;
+.workout-history-container h2 {
+
+    font-size: 1.8em;
 }
 

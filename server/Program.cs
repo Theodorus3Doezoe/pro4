@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
-
+using Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -291,6 +291,35 @@ app.MapGet("/api/workouts/my", async (MyDbContext dbContext, ClaimsPrincipal cla
 })
 .RequireAuthorization(); // Alleen ingelogde gebruikers kunnen hun workouts zien
 
+// --- NIEUW ENDPOINT VOOR HIGHSCORES ---
+app.MapGet("/api/highscores/top/{count}", async (int count, MyDbContext dbContext) =>
+{
+    if (count <= 0)
+    {
+        return Results.BadRequest(new { message = "Het aantal highscores moet groter zijn dan 0." });
+    }
+
+    var highscores = await dbContext.Workouts
+        .GroupBy(w => w.UserId) // Groepeer workouts per gebruiker
+        .Select(g => new {
+            UserId = g.Key,
+            MaxScore = g.Max(w => w.Score) // Selecteer de hoogste score per gebruiker
+        })
+        .OrderByDescending(s => s.MaxScore) // Sorteer op de hoogste score aflopend
+        .Take(count) // Neem het opgegeven aantal (top X)
+        .Join(dbContext.Users, // Join met de Users tabel om de gebruikersnaam op te halen
+            highscoreEntry => highscoreEntry.UserId,
+            user => user.Id,
+            (highscoreEntry, user) => new UserHighscoreDto // Projecteer naar de DTO
+            {
+                Username = user.Name,
+                Score = highscoreEntry.MaxScore
+            })
+        .ToListAsync();
+
+    return Results.Ok(highscores);
+});
+// --- EINDE NIEUW ENDPOINT ---
 
 app.Run();
 
@@ -316,6 +345,14 @@ public class UserDto
     public int Id { get; set; }
     public required string Name { get; set; }
 }
+
+// --- NIEUWE DTO VOOR HIGHSCORES ---
+public class UserHighscoreDto
+{
+    public required string Username { get; set; }
+    public int Score { get; set; }
+}
+// --- EINDE NIEUWE DTO ---
 
 public record LogWorkoutDto(int Score, double DurationInSeconds, DateTime WorkoutDate);
 

@@ -589,3 +589,4 @@ C:/Users/svend/school/pro4/server/obj/Debug/net9.0/ref/server.dll
 /home/sven/pro4/server/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /home/sven/pro4/server/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
 /home/sven/pro4/server/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
+/home/sven/pro4/server/bin/Debug/net9.0/Dapper.dll
