@@ -251,7 +251,7 @@ app.MapPost("/api/workouts", async (MyDbContext dbContext, ClaimsPrincipal claim
     {
         Score = workoutDto.Score,
         Duration = TimeSpan.FromSeconds(workoutDto.DurationInSeconds), // Converteer seconden naar TimeSpan
-        WorkoutDate = workoutDto.WorkoutDate.ToUniversalTime(), // Sla altijd op in UTC
+        WorkoutDate = TimeZoneInfo.ConvertTimeFromUtc(workoutDto.WorkoutDate.ToUniversalTime(), TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time")),
         UserId = userId // Koppel aan de huidige gebruiker
     };
 
