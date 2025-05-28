@@ -1,6 +1,6 @@
 import './Profile.css'
 import Header from '../../components/Header/Header'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -67,6 +67,18 @@ export default function Profile() {
 
     fetchUserData();
   }, [navigate]);
+
+    const highScore = useMemo(() => {
+    // Als er geen workouts zijn of de array leeg is, is de highscore 0
+    if (!workouts || workouts.length === 0) {
+      return 0;
+    }
+
+    // Gebruik Math.max en de spread operator (...) om de hoogste score te vinden.
+    // We gebruiken map om eerst een array van alleen scores te maken.
+    return Math.max(...workouts.map(workout => workout.score));
+
+  }, [workouts]); // Deze functie draait alleen opnieuw als 'workouts' verandert.
 
   const handleLogout = async () => {
     try {
@@ -137,7 +149,7 @@ export default function Profile() {
         <div className="workout-history-container">
           <div className="top-table-text">
             <h2>Mijn Recente Workouts </h2>
-            <h2>Highscore: ...</h2>
+            <h2>Highscore: {highScore}</h2>
           </div>
             {workouts.length === 0 ? (
                 <p>Je hebt nog geen workouts voltooid om weer te geven.</p>
